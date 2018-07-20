@@ -60,7 +60,7 @@ function run_single_in_docker {
     pip install "futures;python_version=='2.7'"
     pip install "enum34;python_version=='2.7'"
 
-    pip install confluent_kafka --no-index -f $wheelhouse
+    pip install disco.confluent_kafka --no-index -f $wheelhouse
 
     # Pytest relies on a new version of six; later versions of pip fail to remove older versions gracefully
     # https://github.com/pypa/pip/issues/5247

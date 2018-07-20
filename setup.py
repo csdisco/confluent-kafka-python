@@ -32,8 +32,20 @@ def get_install_requirements(path):
     ]
 
 
-setup(name='confluent-kafka',
-      version='0.11.5',
+version = os.getenv('TRAVIS_TAG') or os.getenv('BUILD_VERSION')
+if not version:
+    build_number = os.getenv('TRAVIS_BUILD_NUMBER')
+    if build_number:
+        version = '0.0.' + str(build_number)
+    else:
+        version = '0.0.1'
+
+print("environment is" + str(os.environ))
+print("version is " + str(version))
+
+
+setup(name='disco.confluent-kafka',
+      version=version,
       description='Confluent\'s Apache Kafka client for Python',
       author='Confluent Inc',
       author_email='support@confluent.io',
