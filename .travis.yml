@@ -41,7 +41,6 @@ matrix:
     language: python
     python: "2.7"
     services: docker
-
 install:
  - if [[ $TRAVIS_OS_NAME == "osx" ]]; then python -m ensurepip && virtualenv /tmp/venv && source /tmp/venv/bin/activate ; fi
  - pip install -U pip
@@ -59,18 +58,12 @@ script:
 
 
 deploy:
- provider: s3
- access_key_id:
-  secure: "T0hDlPMFjEliYnd9WjoKAvine5X7zLRLYzH5e2enzog747AveJJGU+I8Plgf+kfMj0hhin0tUWvuvfqEaRV5suSOLuO37Q+bmJRLHPf0ktpTZijXIVXGCw2X34LPyeOqv1XxbtJMD1p7FHEif9wHvUs3pwdBWE/iAwZTUr5B+pCTM02LrrskH1MA83rR/h98+ZK2G2yW+vJttRPIE4GDhG4ekOqkmho3fU2n7uCkEdnboGT/Kq5HkUcEyC9AjpnlLYzcJmgOPDNOKDMwb2pFjkRg1MfXcvaBoQT5bSSQyaS1WIqP9VfDi6oTl1vxuvg1AVLcXvZy9FzWFMjmghDxI/TLVAz0Tnh7RKL6WKqwFxyMRBJhxn81UkkG6c1kOlGDBABEySgAwKG01MkkwbPTaGU0mizxyvqj5JQNxZiS6vn0ZQHb3Y1YVeShdwkg2kb+G8MLKTAs9KYPQPdA5n91/g44BTTlMmy1JKNuBPfagrxyWdz9rDNG1l48HDnmSsERws8grJQh2kCCtON25GU7emtkjsBdfgZuZeVxKPdoW6CT5TUlh4Lo148Mm0OGIKgxsbQLJfRx3MGSBcCOYgYp0zdUDO5UKbli7Mv8A4kEgwXpGZGon20b5DD2O0e/DJWh9APnR/cfUN97OYqukmbk5SG9vt17MAtiVVDwj6UbrNE="
- secret_access_key:
-  secure: "imC8TwsarAxKhS7yMPNCwbvIhHmDhZB/NfWDLUToySP8ZQDWQMdlpiRlEA4RlNP8KOBGBShCX7dMXTC9nGFnbLhDKnpkZaQ3RIkXthjbcmsXiTAWNndVkCrgxDPpFwMHEs1Eu00AgJrELzDlKfhRls1txQO2N5wvVZFa1zyzlm46q4guesVakPVl3bZhx0gImYsJohXNVjvD3cks7+c6hFPDdMIEchgG+0amgCNNdK8ewZGfMMim5nvuHH00h8oJsIxQKOEzgz+JXwCi7hgd5UYn6DRFNyjmIK4iMphjC4pdKKp7r+m6Yj/s/Kc/YMVmRo3Zce4mM66KvmLSnnGGiewGRIkjyZ9UcvbrwkfudSMdPmWjnn0MKs7Vnfaej0xBZ9WN5c1QB6JzsLxStNp7gULfaZyqb7+zNtvYvbHYrFa80/RBpMbSBg6GSslsFmqEtsS9WInzTQYfNeSzrq5QU11ZKdsoQ53kruAtSxDJXFe1TKMSMnH/QWqvjwdrDoaJJZkJuMgNkznKuxorf7syF+mr9O63UKs72fHhEWBNOPfE+pwVlHUuBSE95jr5gu1Nxyyy5GV/sU+x/ik5a5Uytq9pcxhn4v3614VlG6t3Wy29BDDO54Sng0n12XXL2UaTYT6aIPTU1N8XQe66YjVvi7ms8Yt6HCA5+MMJdaSnkoI="
- bucket: librdkafka-ci-packages
- region: us-west-1
- local-dir: wheelhouse
- upload-dir: confluent-kafka-python/p-confluent-kafka-python__bld-travis__plat-${TRAVIS_OS_NAME}__tag-${TRAVIS_TAG}__sha-${TRAVIS_COMMIT}__bid-${TRAVIS_BUILD_ID}__
- acl: public_read
- skip_cleanup: true
+ provider: releases
+ api_key:
+  secure: UBqimO5uslvlA4UXENjIf9cXSZ+Cdt37cE18Xc4duP1wOHEnj2XyVumDALWw0HFvkrSbn2nFaJnkiClSB0lk6Z6yM6xG4W4MeNdKKGMjWwmSMfUCWX6jwrOYp0wDhN4fIeSqA5H+9AbZ8VIZkCMZU1YDk9QqLjIW5DXp5j9NzvzUfc7BxowLBXnpr+l3fQn96ZS3owbF9dq5AUoKatyhwOuip+9OBChyxJzRSATVqo3Gzay1h7m0za/ncxU4WlEETydzUA9/cxZ2T8+tUCFoQwVDXw/e2Ba/WCkFY4QZuLKfOOHQDPLfyn8SCqPKbjVgYLCfLG5+BnS/KLB5p2WQvgEpgw9VF/I+F+edIyKKlRfTVjBGlV4hEBsMc4YCEwpl1ydHAIsoeY2AGQ67u1sfhTAAS3CY8Vs4G9U5sfHKNMo3XanjY0JiofT3s1syoqqH3qIaMFpEte81+DAUbV6+c2S1aNVTOwKYuokEWyyl2qPQyYuzEmfj/+Ugd2N/NSgW+YtJ7YpXKgyIYqOVEUbIPAtHAxbX11mpr3TfsX/sozxj2ZQzRntPZ40KLZuJ/qNwFTyfFeScEzsnXJRGmRB25lZ3w5GPo0b1G9xAAqtn6FdCQeLXVJq9myJuLyeJyCpNt5Av8SahLVFR9yxKvIJcBy+M9GnYPLOi6lx/FmElX08=
+ file_glob: true
+ file: wheelhouse/*.whl
  on:
-  repo: confluentinc/confluent-kafka-python
+  repo: csdisco/confluent-kafka-python
   tags: true
   condition: "-n $CIBW_BEFORE_BUILD"
