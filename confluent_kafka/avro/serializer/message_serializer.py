@@ -154,18 +154,16 @@ class MessageSerializer(object):
             return outf.getvalue()
 
     # Decoder support
-    def _get_decoder_func(self, schema_id, payload):
+    def _get_decoder_func(self, schema_id, payload, schema):
+        """
+        Returns a function that can decode an avro message.  Decoders are cached once created.
+        :param schema_id: the schema registry id for the schema
+        :param payload: the binary avro payload
+        :param schema: the schema used to encode the message
+        :return:
+        """
         if schema_id in self.id_to_decoder_func:
             return self.id_to_decoder_func[schema_id]
-
-        # fetch from schema reg
-        try:
-            schema = self.registry_client.get_by_id(schema_id)
-        except ClientError as e:
-            raise SerializerError("unable to fetch schema with id %d: %s" % (schema_id, str(e)))
-
-        if schema is None:
-            raise SerializerError("unable to fetch schema with id %d" % (schema_id))
 
         curr_pos = payload.tell()
         if HAS_FAST:
@@ -198,6 +196,18 @@ class MessageSerializer(object):
         self.id_to_decoder_func[schema_id] = decoder
         return self.id_to_decoder_func[schema_id]
 
+    def _load_schema(self, schema_id):
+        # fetch from schema reg
+        try:
+            schema = self.registry_client.get_by_id(schema_id)
+        except ClientError as e:
+            raise SerializerError("unable to fetch schema with id %d: %s" % (schema_id, str(e)))
+
+        if schema is None:
+            raise SerializerError("unable to fetch schema with id %d" % (schema_id))
+
+        return schema
+
     def decode_message(self, message):
         """
         Decode a message from kafka that has been encoded for use with
@@ -215,5 +225,6 @@ class MessageSerializer(object):
             magic, schema_id = struct.unpack('>bI', payload.read(5))
             if magic != MAGIC_BYTE:
                 raise SerializerError("message does not start with magic byte")
-            decoder_func = self._get_decoder_func(schema_id, payload)
-            return decoder_func(payload)
+            schema = self._load_schema(schema_id)
+            decoder_func = self._get_decoder_func(schema_id, payload, schema)
+            return decoder_func(payload), schema
