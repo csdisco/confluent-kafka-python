@@ -2,7 +2,6 @@
     Avro schema registry module: Deals with encoding and decoding of messages with avro schemas
 
 """
-
 from confluent_kafka import Producer, Consumer
 from confluent_kafka.avro.error import ClientError
 from confluent_kafka.avro.load import load, loads  # noqa
@@ -11,6 +10,7 @@ from confluent_kafka.avro.serializer import (SerializerError,  # noqa
                                              KeySerializerError,
                                              ValueSerializerError)
 from confluent_kafka.avro.serializer.message_serializer import MessageSerializer
+from confluent_kafka.avro.serializer.name_strategies import topic_name_strategy
 
 
 class AvroProducer(Producer):
@@ -27,7 +27,8 @@ class AvroProducer(Producer):
     """
 
     def __init__(self, config, default_key_schema=None,
-                 default_value_schema=None, schema_registry=None):
+                 default_value_schema=None, schema_registry=None,
+                 value_subject_name_strategy=topic_name_strategy, key_subject_name_strategy=topic_name_strategy):
 
         schema_registry_url = config.pop("schema.registry.url", None)
         schema_registry_ca_location = config.pop("schema.registry.ssl.ca.location", None)
@@ -46,7 +47,10 @@ class AvroProducer(Producer):
             raise ValueError("Cannot pass schema_registry along with schema.registry.url config")
 
         super(AvroProducer, self).__init__(config)
-        self._serializer = MessageSerializer(schema_registry)
+
+        self._serializer = MessageSerializer(schema_registry,
+                                             key_subject_name_strategy=key_subject_name_strategy,
+                                             value_subject_name_strategy=value_subject_name_strategy)
         self._key_schema = default_key_schema
         self._value_schema = default_value_schema
 
